@@ -62,7 +62,7 @@
       <flow model="richards" state="on" />
 
       <transport state="on" />
-      <chemistry engine="amanzi" process_model="none" state="on" input_filename="farea_tritium.bdg"/>
+      <chemistry engine="amanzi" process_model="none" state="on" input_filename="../shared_files/farea_tritium.bdg"/>
     </process_kernels>
 
     <phases>
@@ -84,7 +84,7 @@
 
     <geochemistry>
       <amanzi_chemistry>
-        <reaction_network file="farea_tritium.bdg" format="simple"/>
+        <reaction_network file="../shared_files/farea_tritium.bdg" format="simple"/>
       </amanzi_chemistry>
     </geochemistry>
 
@@ -95,7 +95,7 @@
     <execution_control_defaults init_dt="1.0" method="picard" mode="steady" />
     <execution_control end="2020,y" mode="transient" start="1954,y" init_dt="60.0" />
 
-      <restart>checkpoints/checkpoint00159.h5</restart>
+      <restart>../shared_files/checkpoint00095.h5</restart>
     </execution_controls>
 
     <numerical_controls>
@@ -164,7 +164,7 @@
       <comments>Read from Exodus II</comments>
       <dimension>3</dimension>
       <read>
-        <file>farea_3D_barriers.exo</file>
+        <file>../shared_files/farea_3D_barriers.exo</file>
         <format>exodus ii</format>
       </read>
     </mesh>
@@ -460,9 +460,9 @@
       </vis>
 
       <checkpoint>
-        <base_filename>checkpoints/checkpoint</base_filename>
+        <base_filename>checkpoint</base_filename>
         <num_digits>5</num_digits>
-        <time_macros>Every year</time_macros>
+        <time_macros>Every five year</time_macros>
       </checkpoint>
 
     </output>
