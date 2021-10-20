@@ -1,10 +1,11 @@
-import os
+import sys
+sys.dont_write_bytecode = True
 
-# import sys
-# from os import replace
+import os
 import yaml
 import argparse
 import numpy as np
+import pandas as pd
 from pprint import pprint
 from joblib import Parallel, delayed
 
@@ -63,7 +64,7 @@ def generate_random_input_params(template_str, var_maps, output_dir, template_fi
 
     output_filepath = os.path.join(
         output_dir,
-        f"sim{var_maps['@@serial_number@@']}",
+        f"sim{var_maps['@serial_number@']}",
         os.path.basename(template_filename).replace(".tpl", ".xml"),
     )
     try:
@@ -101,8 +102,8 @@ def main():
     # template data
     with open(args.input_template, "r") as tpl_f:
         tpl_str = "".join(tpl_f.readlines())
-#     print("--- Template String ---")
-#     print(tpl_str)
+    # print("--- Template String ---")
+    # print(tpl_str)
 
     # Parsing yaml file for variable maps
     var_map_ranges = parse_variable_mapping(mapping_file=args.variable_mapping_file)
@@ -112,7 +113,8 @@ def main():
     # Generating all the variable mappings within the ranges
     var_map_list = list()
     for i in range(args.num_simulations):
-        var_map_i = {"@@serial_number@@": i}
+        var_map_i = {"@serial_number@": i,
+                     "@sim_path@": os.path.join(args.output_dir, f"sim{i}")}
         for k in var_map_ranges:
             rand_val = np.random.uniform(
                 var_map_ranges[k]["low"], var_map_ranges[k]["high"]
@@ -120,15 +122,19 @@ def main():
             var_map_i[k] = rand_val
 
         var_map_list.append(var_map_i)
-#     print(var_map_list)
+    # print(var_map_list)
 
-#     # Replacing values in the template file with the mappings - SAMPLE - SINGLE FILE
-#     generate_random_input_params(
-#         template_str=tpl_str,
-#         var_maps=var_map_list[0],
-#         output_dir=args.output_dir,
-#         template_filename=args.input_template,
-#     )
+    # Saving the randomly sampled parameters to a CSV
+    csv_path = os.path.join(args.output_dir, "sampled_params.csv")
+    pd.DataFrame(var_map_list).to_csv(csv_path, index=False)
+
+    # # Replacing values in the template file with the mappings - SAMPLE - SINGLE FILE
+    # generate_random_input_params(
+    #     template_str=tpl_str,
+    #     var_maps=var_map_list[0],
+    #     output_dir=args.output_dir,
+    #     template_filename=args.input_template,
+    # )
 
     # Replacing values in the template file with the mappings - PARALLEL for all files
     parallel_function(
