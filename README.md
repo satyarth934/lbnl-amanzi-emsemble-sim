@@ -24,3 +24,19 @@ A combination of the two can be used as well where some parameters are specified
    > Mapping of the variables with their corresponding value ranges
 4. `requirements.yml`
    > File used to create the virtual environment.
+
+---
+## Ensemble Simulation
+[`run_ensembles.sh`](run_ensembles.sh) script is used to initiate the ensemble simulation.
+This script requires two inputs:
+1. Output Directory (`-o`)
+   > This directory contains all the individual simulation directories. The output of each simulation is stored in the respective directories.
+3. Number of simulations (`-n`)
+   > This is the number of simulation runs. This number should match the count of simulation directories.
+
+### REQUIREMENT:
+> This script requires a `shared_files` directory within the Output Directory.
+This `shared_files` directory must contain the following files:
+1. `run_amanzi.sh`
+2. `farea_3D_barriers.exo`
+3. `farea_tritium.bdg`
