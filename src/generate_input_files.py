@@ -59,7 +59,7 @@ def generate_random_input_params(template_str, var_maps, output_dir, template_fi
     for k in var_maps:
         # rand_val = np.random.uniform(var_maps[k]["low"], var_maps[k]["high"])
         tpl_str = tpl_str.replace(k, str(var_maps[k]))
-        print(f"updating {k} to {var_maps[k]}...")
+#         print(f"updating {k} to {var_maps[k]}...")
 
     output_filepath = os.path.join(
         output_dir,
@@ -94,17 +94,19 @@ def parse_variable_mapping(mapping_file):
 def main():
     # Parse commandline arguments
     args = parse_arguments()
+    print("--- Arguments ---")
     for k in args.__dict__:
         print(f"{k} => {args.__dict__[k]}")
 
     # template data
     with open(args.input_template, "r") as tpl_f:
         tpl_str = "".join(tpl_f.readlines())
-    print("--- Template String ---")
-    print(tpl_str)
+#     print("--- Template String ---")
+#     print(tpl_str)
 
     # Parsing yaml file for variable maps
     var_map_ranges = parse_variable_mapping(mapping_file=args.variable_mapping_file)
+    print("--- Variable Mappings ---")
     pprint(var_map_ranges, width=3)
 
     # Generating all the variable mappings within the ranges
@@ -118,15 +120,15 @@ def main():
             var_map_i[k] = rand_val
 
         var_map_list.append(var_map_i)
-    print(var_map_list)
+#     print(var_map_list)
 
-    # Replacing values in the template file with the mappings - SAMPLE - SINGLE FILE
-    generate_random_input_params(
-        template_str=tpl_str,
-        var_maps=var_map_list[0],
-        output_dir=args.output_dir,
-        template_filename=args.input_template,
-    )
+#     # Replacing values in the template file with the mappings - SAMPLE - SINGLE FILE
+#     generate_random_input_params(
+#         template_str=tpl_str,
+#         var_maps=var_map_list[0],
+#         output_dir=args.output_dir,
+#         template_filename=args.input_template,
+#     )
 
     # Replacing values in the template file with the mappings - PARALLEL for all files
     parallel_function(
