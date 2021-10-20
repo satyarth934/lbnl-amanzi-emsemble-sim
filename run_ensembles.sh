@@ -1,7 +1,7 @@
 # Example command:
 # ./test.sh -o path/to/output/dir -n 16
 
-# -o: output path
+# -o: output path. this path contains all the simulation directories and their respective input xml files.
 # -n: number of simulations
 
 ##########################
