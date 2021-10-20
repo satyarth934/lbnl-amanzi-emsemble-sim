@@ -28,7 +28,7 @@ A combination of the two can be used as well where some parameters are specified
 ---
 ## Ensemble Simulation
 [`run_ensembles.sh`](run_ensembles.sh) script is used to initiate the ensemble simulation.
-This script requires two inputs:
+This script requires two commandline inputs:
 1. Output Directory (`-o`)
    > This directory contains all the individual simulation directories. The output of each simulation is stored in the respective directories.
 3. Number of simulations (`-n`)
