@@ -38,5 +38,8 @@ This script requires two commandline inputs:
 > This script requires a `shared_files` directory within the Output Directory.
 This `shared_files` directory must contain the following files:
 1. `run_amanzi.sh`
+   > This file is replicated for each simulation and the replicated version is stored in the simulation directory.
+   > The `sbatch` configurations are specified in this file.
+   > Number of processors is also specified in this file.
 2. `farea_3D_barriers.exo`
 3. `farea_tritium.bdg`
