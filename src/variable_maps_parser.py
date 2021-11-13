@@ -12,34 +12,16 @@ import numpy as np
 from typing import List, Tuple
 
 
-def has_dict_val(variable_maps: dict) -> bool:
-    for k in yaml_vals:
-        if type(yaml_vals[k]) == type(dict()):
-            return True
-    
-    return False
-
-
-def has_list_val(variable_maps: dict) -> bool:
-    for k in yaml_vals:
-        if type(yaml_vals[k]) == type(list()):
-            return True
-    
-    return False
-
-
-def perm_needed(variable_maps: dict) -> bool:
-    list_counter = 0
-    for k in yaml_vals:
-        if type(yaml_vals[k]) == type(list()):
-            list_counter += 1
-            if list_counter >= 2:
-                return True
-    
-    return False
-
-
 def get_range_val(range_var_dict: dict) -> float:
+    """Returns a random value from within the specified range for a particular variable.
+    
+    Args:
+        range_var_dict (dict): Sub-dictionary containing the low and high values of the range.
+        
+    Returns:
+        float: Returns the random float between the specied range.
+    """
+    
     low = float(eval(str(range_var_dict["low"])))
     high = float(eval(str(range_var_dict["high"])))
     
@@ -49,10 +31,29 @@ def get_range_val(range_var_dict: dict) -> float:
 
 
 def cast_variable_types(config_dict: dict) -> dict:
+    """Converts all the configurations params from str to float.
+    
+    Args:
+        config_dict (dict): Input configuration dictionary.
+    
+    Returns:
+        dict: Returns type casted configuration dictionary.
+    """
+    
     return {k: float(eval(str(config_dict[k]))) for k in config_dict}
 
 
-def is_perm_possible(yaml_vals, perm_key_list):
+def is_perm_possible(yaml_vals: dict, perm_key_list: list) -> bool:
+    """Check if the permutations are possible for the given variable maps.
+    
+    Args:
+        yaml_vals (dict): The dictionary containing the input variable maps.
+        perm_key_list (list): List of variables that contain list values.
+    
+    Returns:
+        bool: Returns True if permutations are possible, False otherwise.
+    """
+    
     for k in perm_key_list:
         if len(yaml_vals[k]) > 1:
             return True
@@ -190,6 +191,15 @@ def get_config_list_util(yaml_vals: dict, num_sims: int, output_dir: str) -> Lis
 
 
 def is_input_correctly_formatted(yaml_vals: dict) -> Tuple[bool, str]:
+    """Check if the input variable map YAML file is correctly formatted.
+    
+    Args:
+        yaml_vals (dict): The dictionary containing the input variable maps.
+        
+    Returns:
+        Tuple [bool, str]: Returns the formatting status and status message.
+    """
+    
     validity_msg = "SUCCESS: ok"
     
     for k in yaml_vals:
