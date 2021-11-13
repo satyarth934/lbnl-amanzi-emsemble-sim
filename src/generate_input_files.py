@@ -1,6 +1,10 @@
 import sys
 sys.dont_write_bytecode = True
 
+from pyprojroot import here
+root = here(project_files=[".here"])
+sys.path.append(str(root))
+
 import os
 import yaml
 import argparse
@@ -8,6 +12,8 @@ import numpy as np
 import pandas as pd
 from pprint import pprint
 from joblib import Parallel, delayed
+
+from src import variable_maps_parser as vmp
 
 parallel_function = Parallel(n_jobs=-1, verbose=5)
 
@@ -53,7 +59,17 @@ def parse_arguments():
     return args
 
 
-def generate_random_input_params(template_str, var_maps, output_dir, template_filename):
+def generate_input_configs(template_str: str, var_maps: dict, output_dir: str, template_filename: str) -> None:
+    """Generates input configurations for the given variable map. The variable maps are replaced in the template file and stored as a new simulation configuration file in its respective simulation folder in the output directory.
+    
+    Args:
+        template_str (str): the simulation input file read as a string where the configuration params are stored as variables instead of numerical values.
+        var_maps (dict): dictionary containing the mapping of each template variable and its numerical value.
+        output_dir (str): path of directory containing all the simulation directories.
+        template_filename (str): path of the template file.
+        
+    """
+    
     tpl_str = template_str
 
     # for a single input file:
@@ -75,70 +91,30 @@ def generate_random_input_params(template_str, var_maps, output_dir, template_fi
     with open(output_filepath, "w") as f_out:
         f_out.writelines(tpl_str)
 
-    # print("--- Generated Input String ---")
-    # print(inp_str)
-
-
-def parse_variable_mapping(mapping_file):
-    var_map_ranges = yaml.load(open(mapping_file, "r"))
-    for k in var_map_ranges:
-        for k_k in var_map_ranges[k]:
-            temp = var_map_ranges[k][k_k].split("*")
-            if len(temp) == 2:
-                var_map_ranges[k][k_k] = float(temp[0]) * float(temp[1])
-            elif len(temp) == 1:
-                var_map_ranges[k][k_k] = float(temp[0])
-
-    return var_map_ranges
-
 
 def main():
-    # Parse commandline arguments
+    # Parsing commandline arguments
     args = parse_arguments()
     print("--- Arguments ---")
     for k in args.__dict__:
         print(f"{k} => {args.__dict__[k]}")
 
-    # template data
+    # Parsing Template data
     with open(args.input_template, "r") as tpl_f:
         tpl_str = "".join(tpl_f.readlines())
-    # print("--- Template String ---")
-    # print(tpl_str)
 
-    # Parsing yaml file for variable maps
-    var_map_ranges = parse_variable_mapping(mapping_file=args.variable_mapping_file)
-    print("--- Variable Mappings ---")
-    pprint(var_map_ranges, width=3)
-
-    # Generating all the variable mappings within the ranges
-    var_map_list = list()
-    for i in range(args.num_simulations):
-        var_map_i = {"@serial_number@": i,
-                     "@sim_path@": os.path.join(args.output_dir, f"sim{i}")}
-        for k in var_map_ranges:
-            rand_val = np.random.uniform(
-                var_map_ranges[k]["low"], var_map_ranges[k]["high"]
-            )
-            var_map_i[k] = rand_val
-
-        var_map_list.append(var_map_i)
-    # print(var_map_list)
+    # Parsing YAML file for variable maps
+    var_map_list = vmp.get_config_list(mapping_file=args.variable_mapping_file, 
+                                       num_sims=args.num_simulations, 
+                                       output_dir=args.output_dir)
 
     # Saving the randomly sampled parameters to a CSV
     csv_path = os.path.join(args.output_dir, "sampled_params.csv")
     pd.DataFrame(var_map_list).to_csv(csv_path, index=False)
 
-    # # Replacing values in the template file with the mappings - SAMPLE - SINGLE FILE
-    # generate_random_input_params(
-    #     template_str=tpl_str,
-    #     var_maps=var_map_list[0],
-    #     output_dir=args.output_dir,
-    #     template_filename=args.input_template,
-    # )
-
     # Replacing values in the template file with the mappings - PARALLEL for all files
     parallel_function(
-        delayed(generate_random_input_params)(
+        delayed(generate_input_configs)(
             template_str=tpl_str,
             var_maps=var_map_i,
             output_dir=args.output_dir,
